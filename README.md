@@ -16,9 +16,9 @@ This is a TypeScript-based MCP server that implements a simple notes system. It 
 - Plain text mime type for simple content access
 
 ### Tools
-- `create_note` - Create new text notes
-  - Takes title and content as required parameters
-  - Stores note in server state
+- `write_note` - Create new text notes
+  - Takes content as required parameter
+  - Sends the note content to flomo API
 
 ### Prompts
 - `summarize_notes` - Generate a summary of all stored notes
