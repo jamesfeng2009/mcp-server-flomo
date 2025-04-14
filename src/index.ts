@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-import 'dotenv/config';
-
 /**
  * This is a template MCP server that implements a simple notes system.
  * It demonstrates core MCP concepts like resources and tools by allowing:
