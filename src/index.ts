@@ -266,7 +266,8 @@ const server = new Server(
  * Exposes a single "write_note" tool that lets clients create new notes.
  */
 server.setRequestHandler(ListToolsRequestSchema, async (request) => {
-  return {
+  console.error('[MCP Server] Received ListToolsRequest');
+  const response = {
     tools: [
       {
         name: "write_note",
@@ -282,8 +283,24 @@ server.setRequestHandler(ListToolsRequestSchema, async (request) => {
           required: ["content"],
         },
       },
+      {
+        name: "test",
+        description: "A simple test tool",
+        inputSchema: {
+          type: "object",
+          properties: {
+            message: {
+              type: "string",
+              description: "Test message",
+            },
+          },
+          required: ["message"],
+        },
+      },
     ],
   };
+  console.error('[MCP Server] Sending tools list response:', JSON.stringify(response, null, 2));
+  return response;
 });
 
 /**
@@ -291,15 +308,29 @@ server.setRequestHandler(ListToolsRequestSchema, async (request) => {
  * Creates a new note with the content, save to flomo and returns success message.
  */
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  const apiUrl = flomoApiUrl || getAuthValue(request, "flomo_api_url");
-  if (!apiUrl) {
-    console.error('[MCP Server] Flomo API URL not set');
-    throw new Error("Flomo API URL not set");
-  }
-  console.error('[MCP Server] Using Flomo API URL:', apiUrl);
-
+  console.error('[MCP Server] Received tool request:', request.params.name);
+  
   switch (request.params.name) {
+    case "test": {
+      const message = String(request.params.arguments?.message);
+      console.error('[MCP Server] Test message:', message);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Test successful! Message: ${message}`,
+          },
+        ],
+      };
+    }
     case "write_note": {
+      const apiUrl = flomoApiUrl || getAuthValue(request, "flomo_api_url");
+      if (!apiUrl) {
+        console.error('[MCP Server] Flomo API URL not set');
+        throw new Error("Flomo API URL not set");
+      }
+      console.error('[MCP Server] Using Flomo API URL:', apiUrl);
+
       console.error('[MCP Server] Processing write_note request');
       const content = String(request.params.arguments?.content);
       if (!content) {
@@ -307,6 +338,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error("Content is required");
       }
       console.error('[MCP Server] Content length:', content.length);
+
+      // 验证API URL的正确性
+      console.error('[MCP Server] Verifying API URL before creating client');
+      try {
+        const url = new URL(apiUrl);
+        console.error('[MCP Server] API URL is valid, protocol:', url.protocol, 'host:', url.host, 'pathname:', url.pathname);
+      } catch (e) {
+        console.error('[MCP Server] API URL is invalid:', e);
+        throw new Error(`Invalid API URL: ${e instanceof Error ? e.message : 'Unknown error'}`);
+      }
 
       console.error('[MCP Server] Creating FlomoClient instance');
       const flomo = new FlomoClient({ apiUrl });
@@ -334,10 +375,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         ],
       };
     }
-
-    default:
+    default: {
       console.error('[MCP Server] Unknown tool requested');
       throw new Error("Unknown tool");
+    }
   }
 });
 
