@@ -1,4 +1,11 @@
 node_modules/
 build/
 *.log
+
+# Environment files
 .env
+.env.local
+.env.*.local
+
+# Keep .env.example in version control
+!.env.example

@@ -24,10 +24,16 @@ export class FlomoClient {
         });
 
         if (res.ok) {
-            return res.json();
+            let result = await res.json();
+            if (result && result.memo && result.memo.slug) {
+              const memoUrl = `https://v.flomoapp.com/mine/?memo_id=${result.memo.slug}`;
+              result.memo.url = memoUrl;
+              return result;
+          }
         } else {
             throw new Error(`Failed to write note: ${res.status} ${res.statusText}`);
         }
+    
     } catch (error) {
       throw error;
     }

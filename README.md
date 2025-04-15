@@ -32,6 +32,10 @@ Install dependencies:
 npm install
 ```
 
+Configure environment variables:
+1. Copy `.env.example` to `.env`
+2. Update `FLOMO_API_URL` in `.env` with your Flomo API key
+
 Build the server:
 ```bash
 npm run build

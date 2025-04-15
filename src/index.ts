@@ -115,6 +115,20 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           },
           required: ["content"]
         }
+      },
+      {
+        name: "set_api_url",
+        description: "Set Flomo API URL",
+        inputSchema: {
+          type: "object",
+          properties: {
+            api_url: {
+              type: "string",
+              description: "Your Flomo API URL (e.g., https://flomoapp.com/iwh/xxx/xxx/)",
+            },
+          },
+          required: ["api_url"]
+        }
       }
     ]
   };
@@ -139,6 +153,22 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [{
           type: "text",
           text: `write note flomo success: ${JSON.stringify(result)}`
+        }]
+      };
+    }
+    case "set_api_url": {
+      const apiUrl = String(request.params.arguments?.api_url);
+      if (!apiUrl) {
+        throw new Error('API URL is required');
+      }
+      if (!apiUrl.startsWith('https://flomoapp.com/iwh/')) {
+        throw new Error('Invalid Flomo API URL format');
+      }
+      config.setFlomoApiUrl(apiUrl);
+      return {
+        content: [{
+          type: "text",
+          text: "Flomo API URL has been updated successfully"
         }]
       };
     }

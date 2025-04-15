@@ -14,7 +14,7 @@
     "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
     "prepare": "npm run build",
     "watch": "tsc --watch",
-    "inspector": "FLOMO_API_URL=https://flomoapp.com/iwh/MjI3MjkyOQ/a3da8ab3cc8f788eeda892287e0195ef/ npx @modelcontextprotocol/inspector build/index.js",
+    "inspector": "NODE_NO_WARNINGS=1 NODE_OPTIONS='--no-warnings' npx --no-install @modelcontextprotocol/inspector@latest build/index.js --port ${PORT:-6280}",
     "start": "node build/index.js",
     "direct": "node build/index.js"
   },
@@ -24,5 +24,8 @@
   "devDependencies": {
     "@types/node": "^20.11.24",
     "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0 <20.0.0"
   }
 }
